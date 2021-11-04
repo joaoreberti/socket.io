@@ -42,7 +42,7 @@ if (cluster.isMaster) {
     cluster.fork();
   }
 
-  cluster.on("exit", (worker: { process: { pid: any; }; }) => {
+  cluster.on("exit", (worker:any) => {
     console.log(`Worker ${worker.process.pid} died`);
     cluster.fork();
   });
@@ -58,23 +58,51 @@ if (cluster.isMaster) {
   app.get("/socket.io.js", (req: any, res: any) => {
     res.sendFile(path.resolve("./client/socket.io.js"));
   });
+
+  app.get("/create-task", (req, res)=>{
+    
+
+    
+
+  })
+
+
   // use the cluster adapter
   io.adapter(createAdapter());
 
   // setup connection with the primary process
   setupWorker(io);
 
-  io.on("connection", function (socket: any) {
+  io.on("connection", function (socket: any, cenas:any) {
+
+    //conexão com o serviço
+    // a partir daqui é preciso distribuir pelas diferentes "salas"
+
+
     counter++
+    /*   
     console.log("a user connected", { counter }, { pid: process.pid });
-    socket.emit("message", 'user connected');
+    socket.emit("message", 'user connected on pid'+process.pid);
 
     // whenever we receive a 'message' we log it out
     socket.on("message", function (message: any) {
-      console.log(message);
+      
+      io.emit("message", `emitted from pid ${process.pid}`);
+      counter++
+      
+      console.log(message, { counter }, { pid: process.pid });
       // echo the message back down the
       // websocket connection
-      socket.emit("message", message);
+      //socket.emit("message", message);
+    }); */
+    console.log("a user connected", { counter }, { pid: process.pid });
+    socket.on("client to server event", (data: any)=>{
+        console.log('client event')
+        socket.emit("server to client event", 'cenas');
+
     });
+
+
+
   });
 }
