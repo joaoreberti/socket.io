@@ -48,20 +48,35 @@ else {
     app.get("/socket.io.js", (req, res) => {
         res.sendFile(path.resolve("./client/socket.io.js"));
     });
+    app.get("/create-task", (req, res) => {
+    });
     // use the cluster adapter
     io.adapter(createAdapter());
     // setup connection with the primary process
     setupWorker(io);
-    io.on("connection", function (socket) {
+    io.on("connection", function (socket, cenas) {
+        //conexão com o serviço
+        // a partir daqui é preciso distribuir pelas diferentes "salas"
         counter++;
+        /*
         console.log("a user connected", { counter }, { pid: process.pid });
-        socket.emit("message", 'user connected');
+        socket.emit("message", 'user connected on pid'+process.pid);
+    
         // whenever we receive a 'message' we log it out
-        socket.on("message", function (message) {
-            console.log(message);
-            // echo the message back down the
-            // websocket connection
-            socket.emit("message", message);
+        socket.on("message", function (message: any) {
+          
+          io.emit("message", `emitted from pid ${process.pid}`);
+          counter++
+          
+          console.log(message, { counter }, { pid: process.pid });
+          // echo the message back down the
+          // websocket connection
+          //socket.emit("message", message);
+        }); */
+        console.log("a user connected", { counter }, { pid: process.pid });
+        socket.on("client to server event", (data) => {
+            console.log('client event');
+            socket.emit("server to client event", 'cenas');
         });
     });
 }
